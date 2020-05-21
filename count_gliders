@@ -22,9 +22,9 @@ for year in {2000..2020}; do
 		# read the csv line per line
 		while read rank change wkz name type points; do
 
-			# add to types array if not in there yet ("-" in glider type name is replaced by " ")
-			if [[ ! "${ARRAY[@]}" =~ "${type/-/ }" ]]; then
-				ARRAY+=(${type/-/ })
+			# add to types array if not in there yet
+			if [[ ! "${ARRAY[@]}" =~ "${type}" ]]; then
+				ARRAY+=(${type})
 			fi
 
 		done < csv/${year}.csv
@@ -46,6 +46,7 @@ for year in {2000..2020}; do
 	if [ -f csv/${year}.csv ]; then
 
 		COUNT=""
+		NRTOT="$(cat csv/${year}.csv | wc -l | awk '{print $1}')"
 
 		# for each glider type
 		for i in "${ARRAY[@]}"; do
@@ -56,7 +57,8 @@ for year in {2000..2020}; do
 			fi
 
 			# add counted glider types to the variable
-			COUNT+="$(grep -oi ${i} csv/${year}.csv | wc -l | awk '{print $1}')"
+			NRGLD="$(grep -oi ${i} csv/${year}.csv | wc -l | awk '{print $1}')"
+			COUNT+="$(echo \"$(( 200*${NRGLD}/${NRTOT} - 100*${NRGLD}/${NRTOT} ))\" | bc )"
 
 		done
 
