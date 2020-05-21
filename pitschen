@@ -1,0 +1,52 @@
+#!/bin/bash
+
+IFS=';'
+shopt -s nocasematch
+
+ARRAY=()
+echo "" > types.txt
+
+for year in {2000..2020}; do
+
+	if [ -f types.txt ]; then
+		ARRAY=($(cat types.txt))
+	fi
+
+	if [ -f csv/${year}.csv ]; then
+
+		while read rank change wkz name type points; do
+
+			if [[ ! "${ARRAY[@]}" =~ "${type/-/ }" ]]; then
+				ARRAY+=(${type/-/ })
+			fi
+
+		done < csv/${year}.csv
+
+		echo "${ARRAY[*]}" > types.txt
+
+	fi
+	
+done
+
+echo "year;${ARRAY[*]}" > data.txt
+
+for year in {2000..2020}; do
+
+	if [ -f csv/${year}.csv ]; then
+
+		COUNT=""
+
+		for i in "${ARRAY[@]}"; do
+			if [[ "${COUNT}" != "" ]]; then
+				COUNT+=";"
+			fi
+			COUNT+="$(grep -oi ${i} csv/${year}.csv | wc -l | awk '{print $1}')"
+		done
+
+		echo "${year};${COUNT}" >> data.txt
+
+		echo "${ARRAY[*]}" > types.txt
+	
+	fi
+
+done
