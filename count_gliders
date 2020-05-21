@@ -71,3 +71,6 @@ done
 
 # returning content of data.txt
 cat data.txt
+
+# plotting
+gnuplot -p settings.gnuplot
